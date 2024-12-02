@@ -35,14 +35,14 @@
 }
 
 :root {
-  --background: #000;
+  --background: #0a0a0a;
   --foreground: #fff;
   --borders: #333;
   --text-gray-300: #666;
   --text-gray-400: #888;
   --text-gray-600: #b3b3b3;
-  --text-gray-700: #999;
-  --text-gray-800: #ccc;
+  --text-gray-700: #3d3d3d;
+  --text-gray-800: #6f6f6f;
   --white: #000000;
   --black: #fff;
   --selection-background: #333;
@@ -60,7 +60,7 @@
 
   --warning: #ff9800;
   --error: #f44336;
-  --info: #2196f3;
+  --info: #2463eb;
   --success: #4caf50;
 
   --border-radius: 0.5rem;

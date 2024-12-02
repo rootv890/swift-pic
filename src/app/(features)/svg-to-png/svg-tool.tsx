@@ -9,96 +9,25 @@ import React, {
 } from "react";
 import { BsCloudUpload } from "react-icons/bs";
 import { FaArrowLeft } from "react-icons/fa6";
-
-//  🫸🏻 Scale SVG 🫷🏻
-function scaleSVG(svgContent: string, scale: number) {
-  const parser = new DOMParser(); // Parse SVG
-  const svgParsed = parser.parseFromString(svgContent, "image/svg+xml"); // SVG Parsed
-
-  const svgElement = svgParsed.documentElement;
-  const width = parseInt(svgElement.getAttribute("width") || "300");
-  const height = parseInt(svgElement.getAttribute("height") || "100");
-
-  //   Scaling
-  const scaledWidth = width * scale;
-  const scaledHeight = height * scale;
-
-  //   Apply Scaling
-  svgElement.setAttribute("width", scaledWidth.toString());
-  svgElement.setAttribute("height", scaledHeight.toString());
-
-  return new XMLSerializer().serializeToString(svgParsed); // Return Scaled SVG
-}
-
-// useSVGConverter
-interface SVGConvertorProps {
-  canvas: HTMLCanvasElement | null;
-  svgContent: string;
-  scale: number;
-  fileName?: string;
-
-  imageMetadata: {
-    name: string;
-    width: number;
-    height: number;
-  };
-}
-
-/**
- * Give input of svgContent and scale and imageMetadata
- * when save to png button is clicked create a canvas and draw the svg content in the canvas adn trigger the download
- */
-
-function useSVGConverter({
-  canvas,
-  imageMetadata,
-  fileName,
-  scale,
-  svgContent,
-}: SVGConvertorProps) {
-  function convertToPNG() {
-    const scaledSVG = scaleSVG(svgContent, scale);
-    // const canvas = document.createElement("canvas");
-    const context = canvas?.getContext("2d");
-    if (!context) {
-      throw new Error("Failed to create canvas context");
-    }
-
-    const img = new Image();
-
-    function saveImage(fileName: string) {
-      const url = canvas?.toDataURL("image/png");
-      const link = document.createElement("a");
-      link.href = url ?? "";
-
-      link.download = `${fileName.replace(".svg", "")}-${scale}x.png`;
-      // Finally, trigger the download
-      link.click();
-    }
-
-    img.onload = () => {
-      context.drawImage(img, 0, 0);
-      console.log("Image drawn");
-      saveImage(fileName ?? "svg_converted");
-    };
-
-    img.src = `data:image/svg+xml;utf8,${encodeURIComponent(scaledSVG)}`;
-
-    console.log("Image loaded", img.src);
-  }
-
-  return {
-    convertToPNG,
-    canvasProps: {
-      width: imageMetadata.width * scale,
-      height: imageMetadata.height * scale,
-      name: imageMetadata.name ?? "svg_converted",
-    },
-  };
-}
+import useSVGConverter from "./use-svg-convertor";
 
 interface SVGRendererProps {
   svgContent: string;
+}
+
+function getSVGMetadata(svgContent: string) {
+  const parser = new DOMParser();
+  const svgDoc = parser.parseFromString(svgContent, "image/svg+xml");
+
+  const svgEl = svgDoc.documentElement;
+
+  const width = parseInt(svgEl.getAttribute("width") || "300");
+  const height = parseInt(svgEl.getAttribute("height") || "100");
+  const name = svgEl.getAttribute("name") || "svg";
+
+  console.log(svgEl.getAttribute("name"));
+
+  return { width, height, name };
 }
 
 // TO render the uploaded SVG
@@ -151,11 +80,11 @@ function SaveAsPngButton({
   });
   return (
     <div>
+      {/* The canvas where image will be drawn */}
       <canvas ref={setCanvasRef} {...canvasProps} hidden></canvas>
       <button
-        className="rounded-lg bg-green-700 px-4 py-2 text-sm font-semibold text-white shadow-md transition-colors duration-200 hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-75"
+        className="rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-white shadow-md transition-colors duration-200 hover:bg-emerald-400 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-75"
         onClick={() => {
-          console.log("clicked!");
           convertToPNG();
         }}
       >
@@ -165,62 +94,57 @@ function SaveAsPngButton({
   );
 }
 
-interface UploadSVGButtonProps {
+interface FileUploadProps {
   svgContent: string | null;
   fileName: string;
   setSvgContent: (svgContent: string) => void;
   handleSVGChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-function UploadSVGButton({
+function FileUploadButton({
   svgContent,
   fileName,
   handleSVGChange,
-}: UploadSVGButtonProps) {
-  function handleDrop(e: React.DragEvent<HTMLInputElement>) {
-    e.preventDefault();
-    e.stopPropagation();
-    const files = Array.from(e.dataTransfer.files);
-    const file = files[0] as File;
-    console.log(file);
-  }
+}: FileUploadProps) {
+  const fileUploadRef = useRef<HTMLInputElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
   return (
     <div className="flex flex-col gap-2 items-center justify-center">
+      {!svgContent && (
+        <div className="flex flex-col items-center">
+          <p className="text-zinc-600">No SVG Uploaded</p>
+          <p className="text-zinc-600">Upload SVG to get started</p>
+        </div>
+      )}
+
       <input
-        onDrop={handleDrop}
-        onDragOver={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-        }}
+        hidden
+        ref={fileUploadRef}
         type="file"
         accept=".svg"
         onChange={handleSVGChange}
       />
-      {/* Drag and Drop  or upload SVG */}
 
+      {/* TODO : Drag and Drop  or upload SVG */}
       {svgContent && (
         <>
           <SVGRenderer svgContent={svgContent} />
           <p className="text-sm text-zinc-400">{fileName}</p>
         </>
       )}
+
+      <button
+        ref={buttonRef}
+        onClick={() => {
+          fileUploadRef.current?.click();
+        }}
+        className="bg-blue-600 hover:bg-blue-700 transition-colors duration-200 rounded-full px-4 my-6 py-2"
+      >
+        {svgContent ? "Upload New SVG" : "Upload SVG"}
+      </button>
     </div>
   );
-}
-
-function getSVGMetadata(svgContent: string) {
-  const parser = new DOMParser();
-  const svgDoc = parser.parseFromString(svgContent, "image/svg+xml");
-
-  const svgEl = svgDoc.documentElement;
-
-  const width = parseInt(svgEl.getAttribute("width") || "300");
-  const height = parseInt(svgEl.getAttribute("height") || "100");
-  const name = svgEl.getAttribute("name") || "svg";
-
-  console.log(svgEl.getAttribute("name"));
-
-  return { width, height, name };
 }
 
 const SVGToolCore = () => {
@@ -239,6 +163,8 @@ const SVGToolCore = () => {
 
   const customScaleInputRef = useRef<HTMLInputElement>(null);
   const customButtonRef = useRef<HTMLButtonElement>(null);
+  const scaleControllerRef = useRef<HTMLDivElement>(null);
+  const movingDivRef = useRef<HTMLDivElement>(null);
 
   //  🎯  focus the custom scale input
   useImperativeHandle(
@@ -258,6 +184,27 @@ const SVGToolCore = () => {
     }
   }, [svgContent]);
 
+  // Moving Div
+  useEffect(() => {
+    const totalWidth =
+      scaleControllerRef.current?.getBoundingClientRect().width;
+    const currentIndex = scales.findIndex((s) => s === scale);
+    const eachDivWidth = 40; // 40px
+    const gap = 10; // 8px
+    const offset = 8;
+    if (movingDivRef.current) {
+      const leftPosition =
+        currentIndex * (eachDivWidth + gap) + offset - 2 * currentIndex;
+      movingDivRef.current.style.left = `${leftPosition}px`;
+
+      if (customScale) {
+        movingDivRef.current!.style.display = "none";
+      } else {
+        movingDivRef.current!.style.display = "block";
+      }
+    }
+  }, [scale]);
+
   //  🕣 handle file change
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -273,72 +220,23 @@ const SVGToolCore = () => {
 
   return (
     <div>
-      <UploadSVGButton
+      <FileUploadButton
         fileName={fileName}
         svgContent={svgContent}
         setSvgContent={setSvgContent}
         handleSVGChange={handleChange}
       />
 
-      {/* Scale Controller */}
-      <div className="flex bg-zinc-800 p-2 w-fit mx-auto gap-2 rounded-lg">
-        {scales.map((scaleValue) => {
-          return (
-            <button
-              key={scaleValue + "x"}
-              onClick={() => {
-                setCustomScale(false);
-                setScale(scaleValue);
-              }}
-              className={`p-3 rounded-lg bg-zinc-950 ${
-                scaleValue === scale && !customScale ? "bg-info" : ""
-              } transition-colors duration-200`}
-            >
-              {scaleValue}
-            </button>
-          );
-        })}
-
-        <button
-          className={`p-3 rounded-lg bg-zinc-950 transition-colors duration-200  ${
-            customScale ? "bg-info" : ""
-          }`}
-          onClick={() => {
-            setCustomScale(true);
-            if (customScale) {
-              customButtonRef.current?.focus();
-            }
-          }}
-        >
-          Custom{" "}
-        </button>
-        {customScale && (
-          <div>
-            <input
-              ref={customScaleInputRef}
-              type="number"
-              className="w-24 h-12 rounded-lg bg-zinc-950 focus:outline-none focus:ring-2 ring-blue-600  transition-all duration-200 p-2   "
-              onChange={(e) => {
-                let value = parseInt(e.target.value);
-                if (value) {
-                  setScale(value);
-                }
-              }}
-            />
-          </div>
-        )}
-      </div>
-
       {metadata && (
-        <div className="flex items-center gap-2 justify-center">
-          <div className="flex flex-col items-center justify-center bg-zinc-800 mt-6 p-2 w-fit mx-auto gap-2 rounded-lg">
+        <div className="flex items-center  gap-4 my-6 justify-center w-fit mx-auto">
+          <div className="flex flex-col items-center justify-center bg-zinc-900 mt-6 p-2 px-4 w-fit mx-auto gap-1 rounded-lg">
             <p>Original</p>
             <p>
               {metadata?.width} x {metadata?.height}
             </p>
           </div>
-          <div className="flex flex-col items-center justify-center bg-zinc-800 mt-6 p-2 w-fit mx-auto gap-2 rounded-lg">
-            <p>Original</p>
+          <div className="flex flex-col items-center justify-center bg-zinc-900 mt-6 p-2 px-4 w-fit mx-auto gap-1 rounded-lg">
+            <p>Scaled</p>
             <p>
               {metadata?.width! * scale} x {metadata?.height! * scale}
             </p>
@@ -346,12 +244,100 @@ const SVGToolCore = () => {
         </div>
       )}
 
-      <SaveAsPngButton
-        fileName={fileName}
-        metadata={metadata ?? { name: "svg", width: 394, height: 80 }}
-        scale={scale}
-        svgContent={svgContent ?? ""}
-      />
+      {/* Scale Controller */}
+      {svgContent && (
+        <div className="flex flex-col gap-2 items-center ">
+          <p className="text-zinc-400">Scale </p>
+          <div
+            ref={scaleControllerRef}
+            className="flex bg-[#161616]  transition-all duration-1000 ease-in-out  relative p-2 w-fit mx-auto gap-2 rounded-lg z-10 items-center justify-center"
+          >
+            {/* Moving Div on hover */}
+
+            {scales.map((scaleValue) => {
+              return (
+                <button
+                  key={scaleValue + "x"}
+                  onClick={() => {
+                    setCustomScale(false);
+                    setScale(scaleValue);
+                  }}
+                  // style={{
+                  //   backgroundColor:
+                  //     scaleValue === scale && !customScale ? "var(--info)" : "",
+                  // }}
+                  className={`p-3 w-10 h-10 rounded-lg z-0 bg-zinc-950  transition-colors duration-200 relative`}
+                >
+                  <div className="absolute  top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                    {scaleValue}
+                  </div>
+                </button>
+              );
+            })}
+            <div
+              ref={movingDivRef}
+              className="absolute  origin-left  z-10 left-2 top-3 opacity-100 w-10 h-10 rounded-lg p-3 bg-blue-600 transition-all duration-1000  "
+            >
+              {" "}
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 delay-300 transition-all duration-1000 ease-in-out">
+                {scale}
+              </div>
+            </div>
+
+            <button
+              className={`p-3 rounded-2xl bg-zinc-950 w-24 transition-colors duration-200  ${
+                customScale ? "bg-info" : ""
+              }`}
+              onClick={() => {
+                setCustomScale(true);
+                movingDivRef.current!.style.display = "none";
+                if (customScale) {
+                  customButtonRef.current?.focus();
+                }
+              }}
+            >
+              Custom{" "}
+            </button>
+
+            {customScale && (
+              <div className="transition-all duration-100 ease-in">
+                <input
+                  ref={customScaleInputRef}
+                  type="number"
+                  placeholder="Scale"
+                  className="w-24 h-12 rounded-lg placeholder:text-sm bg-zinc-950 focus:outline-none focus:ring-2 ring-blue-600  transition-all duration-200 p-2   "
+                  onChange={(e) => {
+                    let value = parseInt(e.target.value);
+                    if (value) {
+                      setScale(value);
+                    }
+                  }}
+                />
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {svgContent && (
+        <div className="flex justify-center gap-2 items-center mt-6">
+          <button
+            onClick={() => {
+              setSvgContent(null);
+              setMetadata(null);
+            }}
+            className="bg-red-600 rounded-full px-4 py-2  focus:ring-2 focus:ring-red-400"
+          >
+            Cancel
+          </button>
+          <SaveAsPngButton
+            fileName={fileName}
+            metadata={metadata ?? { name: "svg", width: 394, height: 80 }}
+            scale={scale}
+            svgContent={svgContent ?? ""}
+          />
+        </div>
+      )}
     </div>
   );
 };
