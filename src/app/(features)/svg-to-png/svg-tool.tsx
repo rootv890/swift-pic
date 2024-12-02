@@ -1,13 +1,6 @@
 "use client";
 import Link from "next/link";
-import React, {
-  useEffect,
-  useImperativeHandle,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-import { BsCloudUpload } from "react-icons/bs";
+import React, { useEffect, useImperativeHandle, useRef, useState } from "react";
 import { FaArrowLeft } from "react-icons/fa6";
 import useSVGConverter from "./use-svg-convertor";
 
@@ -186,8 +179,6 @@ const SVGToolCore = () => {
 
   // Moving Div
   useEffect(() => {
-    const totalWidth =
-      scaleControllerRef.current?.getBoundingClientRect().width;
     const currentIndex = scales.findIndex((s) => s === scale);
     const eachDivWidth = 40; // 40px
     const gap = 10; // 8px
@@ -203,7 +194,7 @@ const SVGToolCore = () => {
         movingDivRef.current!.style.display = "block";
       }
     }
-  }, [scale]);
+  }, [scale, customScale, scales]);
 
   //  🕣 handle file change
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -238,7 +229,9 @@ const SVGToolCore = () => {
           <div className="flex flex-col items-center justify-center bg-zinc-900 mt-6 p-2 px-4 w-fit mx-auto gap-1 rounded-lg">
             <p>Scaled</p>
             <p>
-              {metadata?.width! * scale} x {metadata?.height! * scale}
+              {metadata &&
+                metadata.width * scale + "x" + metadata.height * scale}
+              {/* {metadata?.width! * scale} x {metadata?.height! * scale} */}
             </p>
           </div>
         </div>
@@ -307,7 +300,7 @@ const SVGToolCore = () => {
                   placeholder="Scale"
                   className="w-24 h-12 rounded-lg placeholder:text-sm bg-zinc-950 focus:outline-none focus:ring-2 ring-blue-600  transition-all duration-200 p-2   "
                   onChange={(e) => {
-                    let value = parseInt(e.target.value);
+                    const value = parseInt(e.target.value);
                     if (value) {
                       setScale(value);
                     }
