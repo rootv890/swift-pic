@@ -1,6 +1,12 @@
 "use client";
 import Link from "next/link";
-import React, { useEffect, useImperativeHandle, useRef, useState } from "react";
+import React, {
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { FaArrowLeft } from "react-icons/fa6";
 import useSVGConverter from "./use-svg-convertor";
 
@@ -148,7 +154,7 @@ const SVGToolCore = () => {
     name: string;
   } | null>(null);
 
-  const scales = [1, 2, 4, 8, 16, 32, 64];
+  const scales = useMemo(() => [2, 4, 8, 16, 32, 64], []);
   const [scale, setScale] = useState<number>(scales[1]);
   const [customScale, setCustomScale] = useState<boolean>(false);
 

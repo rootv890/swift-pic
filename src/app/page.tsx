@@ -21,10 +21,10 @@ const page = () => {
             </Link>
             , JPG, WEBP.
             <Link
-              href={"/resize"}
-              className="bg-syntax-number py-px px-1 text-background rounded-mdd ml-1 transform hover:rotate-6 inline-block transition-all duration-300"
+              href={"/square-image"}
+              className="bg-syntax-number py-px px-1 text-background rounded-mdd mx-2 transform hover:rotate-6 inline-block transition-all duration-300 "
             >
-              Resize or Rescale or compress.
+              Square Image
             </Link>
             Rounded Corners you name it!
           </p>
