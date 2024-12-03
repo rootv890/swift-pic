@@ -1,36 +1,48 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SwiftPic 🖼️
 
-## Getting Started
+Hi I am Prootv890, a boring developer.
 
-First, run the development server:
+I wanted to build a simple image modifer tool like converting svg to png, square image with custom background color. Many more.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Currently I the UI is not very attractive, but I will improve it in the future.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+It is a open source project, you can contribute to it and add more tools and help the project grow.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🚀 Current Tools
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- [Square Image](https://swift-pic-zeta.vercel.app/square-image)
+- [SVG to PNG](https://swift-pic-zeta.vercel.app/svg-to-png)
 
-## Learn More
+## 🗺️ Planned Tools
 
-To learn more about Next.js, take a look at the following resources:
+- Image Compressor
+- Image Compressor
+- Image to WebP
+- Image to PDF
+- Filter Image like blur, brightness, contrast, etc.
+- Image to Icon like favicon, apple touch icon, etc.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## TODO
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Add more tools
+- Improve UI/UX
 
-## Deploy on Vercel
+## 🤝 Contributing
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Contributions are welcome! Here's how you can help:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 👤 Author
+
+**Prootv890**
+
+- GitHub: [@rootv890](https://github.com/rootv890)
+
+---
+
+⭐️ Star this repo if you find it helpful!
